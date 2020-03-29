@@ -4,11 +4,23 @@
     <button>Am I clickable?</button>
     <section class="result-container">
       <div class="result without-webworker">
-        <input type="number" v-model="final" />
+        <label for="without-webworker">Without web worker</label>
+        <input
+          type="number"
+          id="without-webworker"
+          name="without-webworker"
+          v-model="final"
+        />
         <div>{{ count }}</div>
       </div>
       <div class="result with-webworker">
-        <input type="number" v-model="wwFinal" />
+        <label for="with-webworker">With web worker</label>
+        <input
+          type="number"
+          id="with-webworker"
+          name="with-webworker"
+          v-model="wwFinal"
+        />
         <div>{{ wwCount }}</div>
       </div>
     </section>
