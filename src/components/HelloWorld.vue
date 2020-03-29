@@ -1,114 +1,68 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br />
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener"
-        >vue-cli documentation</a
-      >.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li>
-        <a
-          href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel"
-          target="_blank"
-          rel="noopener"
-          >babel</a
-        >
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint"
-          target="_blank"
-          rel="noopener"
-          >eslint</a
-        >
-      </li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li>
-        <a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a>
-      </li>
-      <li>
-        <a href="https://forum.vuejs.org" target="_blank" rel="noopener"
-          >Forum</a
-        >
-      </li>
-      <li>
-        <a href="https://chat.vuejs.org" target="_blank" rel="noopener"
-          >Community Chat</a
-        >
-      </li>
-      <li>
-        <a href="https://twitter.com/vuejs" target="_blank" rel="noopener"
-          >Twitter</a
-        >
-      </li>
-      <li>
-        <a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a>
-      </li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li>
-        <a href="https://router.vuejs.org" target="_blank" rel="noopener"
-          >vue-router</a
-        >
-      </li>
-      <li>
-        <a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a>
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/vue-devtools#vue-devtools"
-          target="_blank"
-          rel="noopener"
-          >vue-devtools</a
-        >
-      </li>
-      <li>
-        <a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener"
-          >vue-loader</a
-        >
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/awesome-vue"
-          target="_blank"
-          rel="noopener"
-          >awesome-vue</a
-        >
-      </li>
-    </ul>
+    <button>Am I clickable?</button>
+    <section class="result-container">
+      <div class="result without-webworker">
+        <input type="number" v-model="final" />
+        <div>{{ count }}</div>
+      </div>
+      <div class="result with-webworker">
+        <input type="number" v-model="wwFinal" />
+        <div>{{ wwCount }}</div>
+      </div>
+    </section>
   </div>
 </template>
 
 <script>
-export default {
-  name: "HelloWorld",
-  props: {
-    msg: String
+import { helloWorld } from '@/workers/utils.worker'
+import { debounce } from 'lodash-es'
+import { fibonacci } from '@/utils/utils'
+import { wwFibonacci } from '@/workers/utils.worker'
+
+const debounceFibonacci = debounce((instance, final) => {
+  if (!final) {
+    return
   }
-};
+  instance.count = fibonacci(final)
+}, 250)
+
+const debounceFibonacciAsync = debounce(async (instance, final) => {
+  if (!final) {
+    return
+  }
+  instance.wwCount = await wwFibonacci(final)
+}, 250)
+
+export default {
+  name: 'HelloWorld',
+  data: () => ({
+    msg: '',
+    final: 0,
+    wwFinal: 0,
+    count: 0,
+    wwCount: 0
+  }),
+  async mounted() {
+    this.msg = await helloWorld()
+  },
+  watch: {
+    final(final) {
+      debounceFibonacci(this, final)
+    },
+    wwFinal(final) {
+      debounceFibonacciAsync(this, final)
+    }
+  }
+}
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+.result-container {
+  display: flex;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+.result {
+  flex: 1;
 }
 </style>
