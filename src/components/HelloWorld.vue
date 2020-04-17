@@ -10,6 +10,7 @@
           id="without-webworker"
           name="without-webworker"
           v-model="final"
+          max="45"
         />
         <div>{{ count }}</div>
       </div>
@@ -20,6 +21,7 @@
           id="with-webworker"
           name="with-webworker"
           v-model="wwFinal"
+          max="45"
         />
         <div>{{ wwCount }}</div>
       </div>
